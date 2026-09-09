@@ -6,6 +6,7 @@
 #include "spinlock.h"
 #include "proc.h"
 #include "vm.h"
+#include "ids.h"
 
 uint64
 sys_exit(void)
@@ -111,17 +112,19 @@ sys_uptime(void)
   return xticks;
 }
 
+
 uint64
 sys_ids(void)
 {
   struct proc *p = myproc();
 
-  printk("=== IDS Process Report ===\n");
-  printk("PID: %d\n", p->pid);
-  printk("Fork count: %d\n", p->fork_count);
-  printk("Syscall count: %d\n", p->syscall_count);
-  printk("File access count: %d\n", p->file_access_count);
-  printk("CPU ticks: %d\n", p->cpu_ticks);
+  printk("\n========== XV6 IDS DASHBOARD ==========\n");
+  printk("PID   NAME       FORK   SYSCALL   FILE   CPU   RISK\n");
+  printk("--------------------------------------------------\n");
+
+  ids_print_status(p);
+
+  printk("==================================================\n\n");
 
   return 0;
 }

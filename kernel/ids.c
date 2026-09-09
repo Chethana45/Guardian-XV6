@@ -24,14 +24,16 @@ ids_record_fork(int pid)
 void
 ids_record_syscall(int pid)
 {
-  // System calls are counted silently.
+  if(pid <= 0)
+    return;
 }
 
 // Record file access
 void
 ids_record_file_access(int pid)
 {
-  printk("IDS: Process %d accessed a file\n", pid);
+  if(pid <= 0)
+    return;
 }
 
 // Record CPU usage
@@ -43,7 +45,66 @@ ids_record_cpu_usage(int pid)
 
 // Check process for suspicious activity
 void
-ids_check_process(int pid)
+ids_check_process(struct proc *p)
 {
-  printk("IDS: Checking process %d for suspicious activity\n", pid);
+  if(p == 0)
+    return;
+
+  if(p->fork_count >= IDS_FORK_THRESHOLD) {
+    printk("IDS ALERT: PID %d (%s) - Excessive process creation\n",
+           p->pid, p->name);
+  }
+}
+
+// Calculate IDS risk score
+int
+ids_calculate_risk(struct proc *p)
+{
+  int risk = 0;
+
+  if(p == 0)
+    return 0;
+
+  if(p->fork_count >= IDS_FORK_THRESHOLD)
+    risk += 25;
+
+  if(p->syscall_count >= IDS_SYSCALL_THRESHOLD)
+    risk += 25;
+
+  if(p->file_access_count >= IDS_FILE_THRESHOLD)
+    risk += 25;
+
+  if(p->cpu_ticks >= IDS_CPU_THRESHOLD)
+    risk += 25;
+
+  return risk;
+}
+
+// Print IDS process status
+void
+ids_print_status(struct proc *p)
+{
+  int risk;
+
+  if(p == 0)
+    return;
+
+  risk = ids_calculate_risk(p);
+
+  printk("PID %d (%s): Fork=%d Syscall=%d File=%d CPU=%d Risk=%d ",
+         p->pid, p->name,
+         p->fork_count,
+         p->syscall_count,
+         p->file_access_count,
+         p->cpu_ticks,
+         risk);
+
+  if(risk >= 75)
+    printk("CRITICAL\n");
+  else if(risk >= 50)
+    printk("SUSPICIOUS\n");
+  else if(risk >= 25)
+    printk("WARNING\n");
+  else
+    printk("NORMAL\n");
 }

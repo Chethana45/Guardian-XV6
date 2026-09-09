@@ -104,8 +104,12 @@ struct proc {
 
 
   // IDS monitoring fields
-  int fork_count;
-  int syscall_count;
-  int file_access_count;
-  int cpu_ticks;
+int fork_count;
+int syscall_count;
+int file_access_count;
+int cpu_ticks;
+
+// IDS alert status
+int syscall_alerted;
+int cpu_alerted;
 };

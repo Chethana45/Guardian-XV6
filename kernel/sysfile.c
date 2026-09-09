@@ -393,11 +393,17 @@ sys_open(void)
   end_op();
 
   // IDS: record successful file access
-  struct proc *p = myproc();
-  p->file_access_count++;
-  ids_record_file_access(p->pid);
+struct proc *p = myproc();
+p->file_access_count++;
+ids_record_file_access(p->pid);
 
-  return fd;
+// IDS: check for excessive file access
+if(p->file_access_count >= IDS_FILE_THRESHOLD) {
+  printk("IDS ALERT: PID %d (%s) - Excessive file access\n",
+         p->pid, p->name);
+}
+
+return fd;
 }
 
 uint64

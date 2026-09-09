@@ -5,7 +5,7 @@
 #define IDS_FORK_THRESHOLD       10
 #define IDS_SYSCALL_THRESHOLD    100
 #define IDS_FILE_THRESHOLD       20
-#define IDS_CPU_THRESHOLD        80
+#define IDS_CPU_THRESHOLD        10
 
 // Attack/event types
 #define IDS_EVENT_FORK            1
@@ -20,7 +20,10 @@ void ids_record_fork(int pid);
 void ids_record_syscall(int pid);
 void ids_record_file_access(int pid);
 void ids_record_cpu_usage(int pid);
-
-void ids_check_process(int pid);
+struct proc;
+void ids_check_process(struct proc *p);
+// IDS risk assessment
+int ids_calculate_risk(struct proc *p);
+void ids_print_status(struct proc *p);
 
 #endif

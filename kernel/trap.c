@@ -3,6 +3,7 @@
 #include "memlayout.h"
 #include "riscv.h"
 #include "spinlock.h"
+#include "ids.h"
 #include "proc.h"
 #include "defs.h"
 
@@ -174,11 +175,18 @@ clockintr()
   }
 
   // IDS CPU monitoring
-  struct proc *p = myproc();
+struct proc *p = myproc();
 
-  if (p != 0 && p->state == RUNNING) {
-    p->cpu_ticks++;
+if (p != 0 && p->state == RUNNING) {
+  p->cpu_ticks++;
+
+  if(p->cpu_ticks >= IDS_CPU_THRESHOLD &&
+     p->cpu_alerted == 0) {
+    printk("IDS ALERT: PID %d (%s) - Excessive CPU usage\n",
+           p->pid, p->name);
+    p->cpu_alerted = 1;
   }
+}
 
   // ask for the next timer interrupt. this also clears
   // the interrupt request. 1000000 is about a tenth

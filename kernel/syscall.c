@@ -142,15 +142,28 @@ syscall(void)
   struct proc *p = myproc();
 
   num = p->trapframe->a7;
+
   if (num > 0 && num < NELEM(syscalls) && syscalls[num]) {
+
     // IDS: record system call activity
     p->syscall_count++;
     ids_record_syscall(p->pid);
-    // Use num to lookup the system call function for num, call it,
-    // and store its return value in p->trapframe->a0
+
+    // IDS: check for syscall storm
+   if(p->syscall_count >= IDS_SYSCALL_THRESHOLD &&
+      p->syscall_alerted == 0) {
+      printk("IDS ALERT: PID %d (%s) - Excessive system calls\n",
+             p->pid, p->name);
+      p->syscall_alerted = 1;
+   }
+
+    // Execute system call
     p->trapframe->a0 = syscalls[num]();
+
   } else {
-    printk("%d %s: unknown sys call %d\n", p->pid, p->name, num);
+    printk("%d %s: unknown sys call %d\n",
+           p->pid, p->name, num);
+
     p->trapframe->a0 = -1;
   }
 }

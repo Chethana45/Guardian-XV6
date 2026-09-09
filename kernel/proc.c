@@ -129,6 +129,8 @@ p->fork_count = 0;
 p->syscall_count = 0;
 p->file_access_count = 0;
 p->cpu_ticks = 0;
+p->syscall_alerted = 0;
+p->cpu_alerted = 0;
   p->state = USED;
 
   // Allocate a trapframe page.
@@ -298,8 +300,12 @@ kfork(void)
    pid = np->pid;
 
   // IDS: record fork activity
+  // IDS: record fork activity
   p->fork_count++;
   ids_record_fork(p->pid);
+
+  // IDS: check for fork bomb behavior
+  ids_check_process(p);
 
   release(&np->lock);
 
