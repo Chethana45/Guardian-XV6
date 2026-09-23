@@ -148,6 +148,7 @@ syscall(void)
     // IDS: record system call activity
     p->syscall_count++;
     ids_record_syscall(p->pid);
+    ids_check_process(p);
 
     // IDS: check for syscall storm
    if(p->syscall_count >= IDS_SYSCALL_THRESHOLD &&

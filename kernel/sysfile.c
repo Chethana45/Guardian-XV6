@@ -396,6 +396,7 @@ sys_open(void)
 struct proc *p = myproc();
 p->file_access_count++;
 ids_record_file_access(p->pid);
+ids_check_process(p);
 
 // IDS: check for excessive file access
 if(p->file_access_count >= IDS_FILE_THRESHOLD) {
