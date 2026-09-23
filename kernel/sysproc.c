@@ -7,6 +7,7 @@
 #include "proc.h"
 #include "vm.h"
 #include "ids.h"
+extern struct proc proc[NPROC];
 
 uint64
 sys_exit(void)
@@ -116,13 +117,21 @@ sys_uptime(void)
 uint64
 sys_ids(void)
 {
-  struct proc *p = myproc();
+  struct proc *p;
 
   printk("\n========== XV6 IDS DASHBOARD ==========\n");
   printk("PID   NAME       FORK   SYSCALL   FILE   CPU   RISK\n");
   printk("--------------------------------------------------\n");
 
-  ids_print_status(p);
+  for(p = proc; p < &proc[NPROC]; p++) {
+    acquire(&p->lock);
+
+    if(p->state != UNUSED) {
+      ids_print_status(p);
+    }
+
+    release(&p->lock);
+  }
 
   printk("==================================================\n\n");
 

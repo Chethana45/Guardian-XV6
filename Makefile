@@ -138,6 +138,7 @@ UPROGS=\
         $U/_syscallstorm\
         $U/_ids\
         $U/_cpuhog\
+	$U/_idsdemo\
 	$U/_grep\
 	$U/_init\
 	$U/_kill\
